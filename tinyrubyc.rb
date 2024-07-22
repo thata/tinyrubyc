@@ -5,7 +5,7 @@ def gen(node)
   if node[0] == "lit"
     # 整数の場合
     # 例 : node = ["lit", 123]
-    puts "  mov eax, #{node[1]}"
+    puts "  mov rax, #{node[1]}"
   end
 end
 
