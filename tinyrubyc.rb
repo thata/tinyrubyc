@@ -42,6 +42,13 @@ def gen(node)
     # r12 と r13 の値をスタックから復元
     puts "  pop r13"
     puts "  pop r12"
+  elsif node[0] == "func_call" && node[1] == "p"
+    # 引数を評価して rdi レジスタにセット
+    gen(node[2])
+    puts "  mov rdi, rax"
+
+    # 関数を呼び出す
+    puts "  call #{node[1]}"
   end
 end
 
