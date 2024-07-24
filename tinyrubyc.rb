@@ -49,6 +49,12 @@ def gen(node)
 
     # 関数を呼び出す
     puts "  call #{node[1]}"
+  elsif node[0] == "stmts"
+    # 文を要素として持つ配列を取得
+    stmts = node[1..]
+    stmts.each do |stmt|
+      gen(stmt)
+    end
   end
 end
 
