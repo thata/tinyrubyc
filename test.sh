@@ -66,7 +66,7 @@ assert 33 'p 99 / 3'
 assert 200 'p 10 * 20'
 assert 40 'p 30 + 20 - 10'
 assert 60 'p 10 + 20 + 30'
-assert 9999 'p 10 + 20 - 30 * 4 / 12'
+assert 20 'p 10 + 20 - 30 * 4 / 12'
 
 # 整数リテラル
 assert 4649 'p 4649'
