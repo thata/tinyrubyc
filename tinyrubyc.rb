@@ -2,11 +2,12 @@ require 'minruby'
 
 # 受け取った構文木からアセンブリコードを生成する
 def gen(node)
-  if node[0] == "lit"
+  case node[0]
+  when "lit"
     # 整数の場合
     # 例 : node = ["lit", 123]
     puts "  mov rax, #{node[1]}"
-  elsif %w(+ - * /).include?(node[0])
+  when "+", "-", "*", "/"
     # 四則演算の場合
     # 例 : node = ["+", ["lit", 1], ["lit", 2]]
 
@@ -42,19 +43,21 @@ def gen(node)
     # r12 と r13 の値をスタックから復元
     puts "  pop r13"
     puts "  pop r12"
-  elsif node[0] == "func_call" && node[1] == "p"
+  when "func_call"
     # 引数を評価して rdi レジスタにセット
     gen(node[2])
     puts "  mov rdi, rax"
 
     # 関数を呼び出す
     puts "  call #{node[1]}"
-  elsif node[0] == "stmts"
+  when "stmts"
     # 文を要素として持つ配列を取得
     stmts = node[1..]
     stmts.each do |stmt|
       gen(stmt)
     end
+  else
+    raise "invalid AST error: #{node}"
   end
 end
 
