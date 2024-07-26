@@ -56,7 +56,7 @@ assert() {
 
 # # 変数
 # assert 30 'a = 10; b = 20; p a + b'
-# assert 10 'a = 10; p a'
+assert 10 'a = 10; p a'
 
 # 複文
 assert 4649 '1 + 1; p 4649'

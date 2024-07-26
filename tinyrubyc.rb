@@ -56,6 +56,14 @@ def gen(node)
     stmts.each do |stmt|
       gen(stmt)
     end
+  when "var_assign"
+    # 代入式の右辺を評価
+    gen(node[2])
+    # スタック上のローカル変数領域へ評価結果を格納
+    puts "  mov [rbp-8], rax"
+  when "var_ref"
+    # スタック上のローカル変数領域から値を取得
+    puts "  mov rax, [rbp-8]"
   else
     raise "invalid AST error: #{node}"
   end
@@ -70,7 +78,13 @@ puts "main:"
 puts "  push rbp"
 puts "  mov rbp, rsp"
 
+# ローカル変数用の領域をスタック上に確保（1つだけ）
+puts "  sub rsp, 8"
+
 gen(node)
+
+# スタック上に確保したローカル変数領域を解放（1つだけ）
+puts "  add rsp, 8"
 
 puts "  pop rbp"
 puts "  ret"
