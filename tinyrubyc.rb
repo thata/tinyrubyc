@@ -6,6 +6,7 @@ VAR_BYTE_WIDTH = 8 # 変数のバイト幅は8バイト (= 64ビット)
 def collect_var_assign_nodes(node)
   case node[0]
   when "var_assign"
+    # TODO: 代入式の右辺に変数が含まれる場合の対応は未実装
     [node]
   when "stmts"
     stmts = node[1..]
