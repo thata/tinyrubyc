@@ -82,6 +82,52 @@ def gen(node, env)
     # r12 と r13 の値をスタックから復元
     puts "  pop r13"
     puts "  pop r12"
+  when "==", "!=", ">", ">=", "<", "<="
+    # 比較演算の場合
+    # 例 : node = ["==", ["lit", 1], ["lit", 2]]
+
+    # r12 と r13 の値をスタックへ退避
+    puts "  push r12"
+    puts "  push r13"
+
+    # 左辺の計算結果を r12 へ格納
+    gen(node[1], env)
+    puts "  mov r12, rax"
+
+    # 右辺の計算結果を r13 へ格納
+    gen(node[2], env)
+    puts "  mov r13, rax"
+
+    case node[0]
+    when "=="
+      puts "  cmp r12, r13"
+      puts "  sete al"
+      puts "  movzx rax, al"
+    when "!="
+      puts "  cmp r12, r13"
+      puts "  setne al"
+      puts "  movzx rax, al"
+    when ">"
+      puts "  cmp r12, r13"
+      puts "  setg al"
+      puts "  movzx rax, al"
+    when ">="
+      puts "  cmp r12, r13"
+      puts "  setge al"
+      puts "  movzx rax, al"
+    when "<"
+      puts "  cmp r12, r13"
+      puts "  setl al"
+      puts "  movzx rax, al"
+    when "<="
+      puts "  cmp r12, r13"
+      puts "  setle al"
+      puts "  movzx rax, al"
+    end
+
+    # r12 と r13 の値をスタックから復元
+    puts "  pop r13"
+    puts "  pop r12"
   when "func_call"
     # 引数を評価して rdi レジスタにセット
     gen(node[2], env)
