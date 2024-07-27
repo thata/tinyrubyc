@@ -1,6 +1,6 @@
 require 'minruby'
 
-VAR_BYTE_WIDTH = 8
+VAR_BYTE_WIDTH = 8 # 変数のバイト幅は8バイト (= 64ビット)
 
 # 構文木内の var_assigns ノードを収集する
 def collect_var_assign_nodes(node)
@@ -23,6 +23,19 @@ end
 def collect_var_names(node)
   var_assigns = collect_var_assign_nodes(node)
   var_assigns.map { |var_assign| var_assign[1] }.uniq.sort
+end
+
+# 指定した変数の格納場所を、ベースポインタ(rbp)からのオフセット値を返す
+# 例：
+#   一つ目の変数のメモリアドレス = ベースポインタ(RBP) - 8
+#   二つ目の変数のメモリアドレス = ベースポインタ(RBP) - 16
+#   三つ目の変数のアドレス = ベースポインタ(RBP) - 24
+#   ...
+def var_offset(var_name, env)
+  # 変数名が見つからない場合はエラー
+  raise "undefined local variable: #{var_name}" unless env.include?(var_name)
+
+  (env.index(var_name) + 1) * VAR_BYTE_WIDTH
 end
 
 # 受け取った構文木からアセンブリコードを生成する
@@ -91,7 +104,7 @@ def gen(node, env)
     gen(node[2], env)
 
     # スタック上のローカル変数領域へ評価結果を格納
-    offset = (env.index(var_name) + 1) * VAR_BYTE_WIDTH
+    offset = var_offset(var_name, env)
     puts "  mov [rbp-#{offset}], rax"
   when "var_ref"
     var_name = node[1]
@@ -100,7 +113,7 @@ def gen(node, env)
     raise "undefined local variable: #{var_name}" unless env.include?(var_name)
 
     # スタック上のローカル変数領域から値を取得
-    offset = (env.index(var_name) + 1) * VAR_BYTE_WIDTH
+    offset = var_offset(var_name, env)
     puts "  mov rax, [rbp-#{offset}]"
   else
     raise "invalid AST error: #{node}"
