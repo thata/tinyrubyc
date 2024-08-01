@@ -187,6 +187,29 @@ def gen(node, env)
     puts ".Lelse#{node.object_id}:"
     gen(else_exp, env) if else_exp
     puts ".Lend#{node.object_id}:"
+  when "while"
+    # while の場合
+    # 例 : while (0==0); p(10) end
+    #   => ["while", ["==", ["lit", 0], ["lit", 0]], ["func_call", "p", ["lit", 10]]]
+
+    # 開始ラベル
+    puts ".Lwhile_begin#{node.object_id}:"
+
+    # 条件式を評価
+    cond_exp = node[1]
+    gen(cond_exp, env)
+
+    # 真の場合は body_exp を評価
+    puts "  cmp rax, 0"
+    puts "  je .Lwhile_end#{node.object_id}"
+    body_exp = node[2]
+    gen(body_exp, env)
+
+    # 条件式を評価するため、ループの先頭にジャンプ
+    puts "  jmp .Lwhile_begin#{node.object_id}"
+
+    # 終了ラベル
+    puts ".Lwhile_end#{node.object_id}:"
   else
     raise "invalid AST error: #{node}"
   end
