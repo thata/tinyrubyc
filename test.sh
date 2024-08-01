@@ -31,12 +31,14 @@ assert 1 'case 42; when 0; p(0); when 42; p(1); else p(2); end'
 
 # while
 assert 55 'i = 1; sum = 0; while i <= 10; sum = sum + i; i = i + 1; end; p(sum)'
+assert 10 'i = 0; while (i < 10); i = i + 1; foo = 10; end; p(foo)'
 
 # if
 assert 42 'if (0 == 0); p(42); else p(43); end'
 assert 43 'if (0 == 1); p(42); else p(43); end'
 assert 41 'if (0 == 0); p(41); end'
 assert '' 'if (0 == 1); p(41); end'
+assert 10 'if (0 == 0); a = 10; end; p(a)'
 
 # 真の場合は1、偽の場合は0を返す
 assert 1 'p(1 == 1)'

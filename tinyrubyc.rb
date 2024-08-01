@@ -15,6 +15,24 @@ def collect_var_assign_nodes(node)
       var_assigns += collect_var_assign_nodes(stmt)
     end
     var_assigns
+  when "if"
+    var_assigns = []
+    # 条件式内の var_assigns ノードを収集
+    var_assigns += collect_var_assign_nodes(node[1])
+    # then ブロック内の var_assigns ノードを収集
+    var_assigns += collect_var_assign_nodes(node[2])
+    # else ブロック内の var_assigns ノードを収集
+    if node[3]
+      var_assigns += collect_var_assign_nodes(node[3])
+    end
+    var_assigns
+  when "while"
+    var_assigns = []
+    # 条件式内の var_assigns ノードを収集
+    var_assigns += collect_var_assign_nodes(node[1])
+    # body ブロック内の var_assigns ノードを収集
+    var_assigns += collect_var_assign_nodes(node[2])
+    var_assigns
   else
     []
   end
