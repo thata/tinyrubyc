@@ -32,11 +32,11 @@ assert() {
 # # while
 # assert 55 'i = 1; sum = 0; while i <= 10; sum = sum + i; i = i + 1; end; p(sum)'
 
-# # if
-# assert 42 'if (0 == 0); p(42); else p(43); end'
-# assert 43 'if (0 == 1); p(42); else p(43); end'
-# assert 41 'if (0 == 0); p(41); end'
-# assert '' 'if (0 == 1); p(41); end'
+# if
+assert 42 'if (0 == 0); p(42); else p(43); end'
+assert 43 'if (0 == 1); p(42); else p(43); end'
+assert 41 'if (0 == 0); p(41); end'
+assert '' 'if (0 == 1); p(41); end'
 
 # 真の場合は1、偽の場合は0を返す
 assert 1 'p(1 == 1)'

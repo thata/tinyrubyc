@@ -162,6 +162,31 @@ def gen(node, env)
     # スタック上のローカル変数領域から値を取得
     offset = var_offset(var_name, env)
     puts "  mov rax, [rbp-#{offset}]"
+  when "if"
+    # if の場合
+    # 例 :
+    #   if (0 == 0); p(42); else; p(43); end
+    #   => ["if",
+    #        ["==", ["lit", 0], ["lit", 0]],
+    #        ["func_call", "p", ["lit", 42]],
+    #        ["func_call", "p", ["lit", 43]]]
+
+    # 条件式を評価
+    cond_exp = node[1]
+    gen(cond_exp, env)
+
+    # 真の場合は then_exp を評価
+    puts "  cmp rax, 0"
+    puts "  je .Lelse#{node.object_id}"
+    then_exp = node[2]
+    gen(then_exp, env)
+    puts "  jmp .Lend#{node.object_id}"
+
+    # 偽の場合は else_exp を評価
+    else_exp = node[3]
+    puts ".Lelse#{node.object_id}:"
+    gen(else_exp, env) if else_exp
+    puts ".Lend#{node.object_id}:"
   else
     raise "invalid AST error: #{node}"
   end
