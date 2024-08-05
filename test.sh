@@ -17,10 +17,10 @@ assert() {
     fi
 }
 
-# # func_def
-# assert 120 'def hello(a) b = 20; a + b; end; p hello(100)'
-# assert 30 'def hello() a = 10; b = 20; a + b; end; p hello()'
-# assert 4649 'def hello() 4649; end; p hello()'
+# func_def
+assert 120 'def foo(a) b = 20; a + b; end; p foo(100)'
+assert 30 'def foo() a = 10; b = 20; a + b; end; p foo()'
+assert 4649 'def foo() 4649; end; p foo()'
 
 # # func_call
 assert 21 'p sum6(1, 2, 3, 4, 5, 6)'

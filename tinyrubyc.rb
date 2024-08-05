@@ -6,6 +6,23 @@ VAR_BYTE_WIDTH = 8 # 変数のバイト幅は8バイト (= 64ビット)
  # see: https://scrapbox.io/htkymtks/x86-64%E3%81%AE%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF
  ARG_REGISTERS = ["rdi", "rsi", "rdx", "rcx", "r8", "r9"]
 
+# 構文木内の func_def ノードを収集する
+def collect_func_def_nodes(node)
+  case node[0]
+  when "func_def"
+    [node]
+  when "stmts"
+    stmts = node[1..]
+    func_defs = []
+    stmts.each do |stmt|
+      func_defs += collect_func_def_nodes(stmt)
+    end
+    func_defs
+  else
+    []
+  end
+end
+
 # 構文木内の var_assigns ノードを収集する
 def collect_var_assign_nodes(node)
   case node[0]
@@ -245,22 +262,61 @@ def gen(node, env)
 
     # 終了ラベル
     puts ".Lwhile_end#{node.object_id}:"
+  when "func_def"
+    # ここでは何も行わない
   else
     raise "invalid AST error: #{node}"
   end
 end
 
 # 入力をパースする
-node = minruby_parse(gets)
+node = minruby_parse(ARGF.read)
 
-# 変数名一覧を取得
-env = collect_var_names(node)
+# 関数一覧を取得
+func_defs = collect_func_def_nodes(node)
 
 puts "  .intel_syntax noprefix"
+
+# ユーザー定義関数
+func_defs.each do |func_def|
+  func_name = func_def[1]
+  func_args = func_def[2]
+  func_body = func_def[3]
+
+  puts "  .globl #{func_name}"
+  puts "#{func_name}:"
+  puts "  push rbp"
+  puts "  mov rbp, rsp"
+
+  # ローカル変数一覧（含む引き数）
+  env = func_args + collect_var_names(func_body)
+
+  # ローカル変数用の領域をスタック上に確保
+  puts "  sub rsp, #{env.size * VAR_BYTE_WIDTH}"
+
+  # 引数をローカル変数領域へ格納
+  func_args.each_with_index do |arg, i|
+    offset = var_offset(arg, env)
+    puts "  mov [rbp-#{offset}], #{ARG_REGISTERS[i]}"
+  end
+
+  gen(func_body, env)
+
+  # スタック上に確保したローカル変数領域を解放
+  puts "  add rsp, #{env.size * VAR_BYTE_WIDTH}"
+
+  puts "  pop rbp"
+  puts "  ret"
+end
+
+# メイン関数
 puts "  .globl main"
 puts "main:"
 puts "  push rbp"
 puts "  mov rbp, rsp"
+
+# ローカル変数一覧
+env = collect_var_names(node)
 
 # ローカル変数用の領域をスタック上に確保
 puts "  sub rsp, #{env.size * VAR_BYTE_WIDTH}"
