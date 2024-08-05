@@ -23,7 +23,8 @@ assert() {
 # assert 4649 'def hello() 4649; end; p hello()'
 
 # # func_call
-# assert 30 'p add(10, 20)'
+assert 21 'p sum6(1, 2, 3, 4, 5, 6)'
+assert 86 'hello()'
 
 # case
 assert 2 'case 42; when 0; p(0); when 1; p(1); else p(2); end'

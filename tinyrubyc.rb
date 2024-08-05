@@ -2,6 +2,10 @@ require 'minruby'
 
 VAR_BYTE_WIDTH = 8 # 変数のバイト幅は8バイト (= 64ビット)
 
+ # 関数へ引数を渡すのに使用するレジスタ
+ # see: https://scrapbox.io/htkymtks/x86-64%E3%81%AE%E3%83%AC%E3%82%B8%E3%82%B9%E3%82%BF
+ ARG_REGISTERS = ["rdi", "rsi", "rdx", "rcx", "r8", "r9"]
+
 # 構文木内の var_assigns ノードを収集する
 def collect_var_assign_nodes(node)
   case node[0]
@@ -147,9 +151,22 @@ def gen(node, env)
     puts "  pop r13"
     puts "  pop r12"
   when "func_call"
-    # 引数を評価して rdi レジスタにセット
-    gen(node[2], env)
-    puts "  mov rdi, rax"
+    args = node[2..]
+
+    # 引数が6個以上の場合はエラー
+    raise "too many arguments (given #{args.size}, expected 6)" if args.size > 6
+
+    # 関数の引数を評価してスタックへ退避する
+    args.each do |arg|
+      gen(arg, env)
+      puts "  push rax"
+    end
+
+    # スタックへ退避した引数を、引数渡し用のレジスタへセット
+    args.each_with_index.reverse_each do |_, i|
+      puts "  pop rax"
+      puts "  mov #{ARG_REGISTERS[i]}, rax"
+    end
 
     # 関数を呼び出す
     puts "  call #{node[1]}"
