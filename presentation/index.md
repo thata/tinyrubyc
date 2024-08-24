@@ -16,28 +16,41 @@ class:
 
 Fukuoka RubyistKaigi 04
 2024.09.07
+@htkymtks
 
 ---
 
-## 🙋自己紹介
+## ✂️ 自己紹介
 
-* はたけやまたかし / 永和システムマネジメント
+* はたけやまたかし
+* 永和システムマネジメント
 * X(Twitter)： @htkymtks
-* 趣味の低レイヤ活動
-  * CPU自作（TD4, RISC-V）
-  * RISC-Vシミュレータ自作
-  * MinCamlコンパイラを移植（RISC-V、ARM64）
 
-![bg w:200 right:35% auto](htkymtks.jpg)
+![bg right:50% w:50%](htkymtks.jpg)
+<!-- ![bg w:200 right:35% auto](htkymtks.jpg) -->
 
 ---
+
+## 🐫 趣味の低レイヤ活動
+
+* CPU自作（TD4, RISC-V）
+* RISC-Vシミュレータ自作
+* MinCamlコンパイラを移植（RISC-V、ARM64）
+* コンパイラ自作（TinyRuby）← NEW!!!
+
+---
+
+<!--
+Rubyでコンパイラを作った中で得た経験やコツをお話しします。この話を聞いて、コンパイラ作成や低レイヤな世界に興味を持ってもらえたらうれしいです。
+
+TinyRubyの紹介、コンパイラをさわる中で得たコツをお話し、四則演算を行う簡単なコンパイラの作り方を紹介します
+-->
 
 ### 🙂 今日話すこと
 
-* コンパイラと私
-* TinyRubyについて
+* TinyRubyの紹介
 * コンパイラ作成のTIPS
-* コンパイラ作成の実際
+* コンパイラはじめの一歩
 
 ### 🙃 話さないこと
 
@@ -52,32 +65,16 @@ Fukuoka RubyistKaigi 04
 * 若かりし頃にドラゴンブックで挫折 🐉
 * 東大CPU実験を知り、低レイヤに興味を持つ
   * → MinCamlコンパイラを「ARM64」や「RISC-V」へ移植
-* 1からコンパイラを作ってみたい気持ちが高まる ← 今ココ👈
+* 1からコンパイラを作ってみたい気持ちが高まり ← 今ココ👈
 
 ---
 
-# 🤖 MinRubyとTinyRuby
+<!-- 文字を少し小さく -->
+<style scoped> section { font-size: 2.3em; } </style>
 
-* MinRuby
-  * 「RubyでつくるRuby」の中で作成する、Rubyのサブセット言語
-  * https://www.lambdanote.com/products/ruby-ruby
-* TinyRuby ←（今回作成したやつ）
-  * MinRubyのサブセット
+# 🐇 TinyRuby の紹介
 
-![bg right:40% auto](image-3.png)
-
----
-
-## 👬 MinRubyとの差異
-
-* TinyRubyは...
-  * データ型は整数型のみ
-  * ArrayとHashをサポートしない
-  * 関数の引数は6つまで
-
----
-
-## 🐇 TinyRuby で書いたフィボナッチ数計算
+こんな感じのプログラミング言語
 
 ```ruby
 #
@@ -100,7 +97,7 @@ p fib(10)
 
 ## 🐇🐇 TinyRuby のビルドと実行
 
-コンパイルして実行
+こんな感じにビルドする
 
 ```sh
 # コンパイルしてアセンブリを出力
@@ -116,6 +113,25 @@ $ ./fib
 
 ---
 
+<!-- 文字を少し小さく -->
+<style scoped> section { font-size: 2.3em; } </style>
+
+# 🤖 TinyRuby と MinRuby
+
+* TinyRuby は MinRubyのサブセット
+  * パーサーも MinRuby のものを流用
+* MinRuby
+  * 「RubyでつくるRuby」に登場するRubyのサブセット言語
+  * MinRuby のパーサーは `minruby` ジェムとして提供されている
+* MinRuby との差異
+  * データ型は整数型のみ
+  * ArrayとHashをサポートしない
+  * 関数の引数は6つまで
+
+![bg right:35% auto](image-3.png)
+
+---
+
 ## 🐧 TinyRubyコンパイラのターゲット環境
 
 * CPU
@@ -127,13 +143,15 @@ $ ./fib
 
 # 🍟 コンパイラ作成のTIPS
 
+TinyRuby の作成を通して得たコンパイラ作成のコツを紹介
+
 1) 困ったらCコンパイラに聞く
 2) レジスタとABIを知る
 3) インクリメンタルな機能実装
 
 ---
 
-# (1) 困ったらCコンパイラに聞く
+# :one: 困ったらCコンパイラに聞く
 
 * アセンブリの書き方に悩んだら、Cコンパイラが出力するアセンブリを確認する
 * 2つの確認方法
@@ -180,9 +198,12 @@ return_100:
 
 ---
 
-## ⚡️ Compiler Explorer ( https://godbolt.org/ )
+<!-- 文字を少し小さく -->
+<style scoped> section { font-size: 2.3em; } </style>
 
-様々な言語・コンパイラ・CPUのアセンブリ出力を確認できるウェブサイト
+## 　⚡️ Compiler Explorer ( https://godbolt.org/ )
+
+様々な言語・コンパイラ・CPUのアセンブリ出力を確認できるカッコいいサイト（ドメインもカッコいい）
 
 * C, C++, C#, Go, Rust, Swift, WASM, x86, ARM, RISC-V, MIPS, PowerPC, ...
 
@@ -190,20 +211,33 @@ return_100:
 
 ---
 
-# (2) レジスタとABIを知る
+# :two: レジスタとABIを知る
 
 コンパイラが出力するアセンブリを理解するためには、対象となるCPUの「レジスタ構成」と「ABI」を知る必要がある
 
 ---
 
+<!-- 文字を少し小さく -->
+<style scoped> section { font-size: 2.3em; } </style>
+
 ## 📝 x86-64 の64ビット汎用レジスタ
 
-x86-64 は64ビットの汎用レジスタが16本用意されている
+x86-64 には、64 ビットの汎用レジスタが 16 本用意されている
 
-* RAX, RBX, RCX, RDX, RSI, RDI, RBP, RSP
+* RAX
+* RBX
+* RCX
+* RDX
+* RSI
+* RDI
+* RBP
+* RSP
 * R8 〜 R15 (x86-64 で追加された8本のレジスタ)
 
 ---
+
+<!-- 文字を少し小さく -->
+<style scoped> section { font-size: 2.3em; } </style>
 
 ## 📝 x86-64 レジスタとビット幅
 
@@ -225,6 +259,9 @@ x86-64では、64ビットレジスタの下位ビットを、32ビットレジ�
 
 ---
 
+<!-- 文字を少し小さく -->
+<style scoped> section { font-size: 2.3em; } </style>
+
 #### 🤧 関数の引数の渡し方
 
 * 最初の6つの引数は、RDI, RSI, RDX, RCX, R8, R9 レジスタに渡す
@@ -243,36 +280,51 @@ x86-64では、64ビットレジスタの下位ビットを、32ビットレジ�
 
 ## 🦀 ABI の詳細資料
 
-x86-64  の ABI の詳細については、以下のドキュメントなどを参照
+x86-64 の ABI の詳細については、以下のドキュメントなどを参照
 
 * System V Application Binary Interface AMD64 Supplement
-* https://refspecs.linuxbase.org/elf/x86-64-abi-0.99.pdf
+  * https://refspecs.linuxbase.org/elf/x86-64-abi-0.99.pdf
+* こちらは Linux で採用されている ABI で、Windows などでは異なる ABI が採用されている
 
 ---
 
-# (3) インクリメンタルな機能実装
+<!-- 文字を少し小さく -->
+<style scoped> section { font-size: 2.1em; } </style>
+
+# :three: インクリメンタルな機能実装
 
 * 最初は、入力された整数リテラルを評価するだけのプログラムからスタート
 * 1つずつ機能を追加していく
-  * 整数リテラル → 四則演算 → 変数代入/参照 → 複数ステートメント → 比較演算 → 条件分岐 → 関数呼び出し → 関数定義 → ...
+  * 整数リテラル
+  * → 四則演算
+  * → 変数代入/参照
+  * → 複数ステートメント
+  * → 比較演算
+  * → 条件分岐
+  * → 関数呼び出し
+  * → 関数定義
+  * → ...
 
 ---
 
-## 🏃‍♀️ インクリメンタルな機能実装のメリット
+<!-- 文字を少し小さく -->
+<style scoped> section { font-size: 2.3em; } </style>
 
-* 簡単な機能から段階的に機能を追加していくことで、コンパイラへの理解を徐々に深めていくことができる
-* モチベーションの維持
+## 🎲 インクリメンタルな機能実装のメリット
 
-##### 参考
+* コンパイラへの理解を徐々に深めることができる
+* モチベーションを維持しやすい
+
+#### 参考サイト
 
 * 低レイヤを知りたい人のためのCコンパイラ作成入門 https://www.sigbus.info/compilerbook
 * An Incremental Approach to Compiler Construction http://scheme2006.cs.uchicago.edu/11-ghuloum.pdf
 
 ---
 
-# 🚶 コンパイラはじめの一歩
+# :walking: コンパイラはじめの一歩
 
-これまで紹介したテクニックを使って、整数を評価して返すだけの TinyRuby コンパイラを作ってみます
+これまで紹介したTIPSを使って、整数を評価して返すだけの TinyRuby コンパイラを作ってみます
 
 * 既存の言語のパーサを利用
 * 困ったらCコンパイラに聞く
