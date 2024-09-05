@@ -6,8 +6,16 @@ assert() {
 
     echo "$input" > tmp.rb
     ruby tinyrubyc.rb tmp.rb > tmp.s
-    docker run --platform linux/amd64 --rm -v ${PWD}:/app -w /app gcc gcc -z noexecstack tmp.s libtinyruby.c -o tmp
-    actual=`docker run --platform linux/amd64 --rm -v ${PWD}:/app -w /app gcc ./tmp`
+
+    if [ "$(uname)" = 'Darwin' ]; then
+        # macOSから呼び出した場合
+        docker run --platform linux/amd64 --rm -v ${PWD}:/app -w /app gcc gcc -z noexecstack tmp.s libtinyruby.c -o tmp
+        actual=`docker run --platform linux/amd64 --rm -v ${PWD}:/app -w /app gcc ./tmp`
+    else
+        # Linuxから呼び出した場合
+        gcc -z noexecstack tmp.s libtinyruby.c -o tmp
+        actual=`./tmp`
+    fi
 
     if [ $actual = $expected ]; then
         echo "$input => $actual"
