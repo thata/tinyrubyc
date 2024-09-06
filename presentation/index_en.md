@@ -6,6 +6,8 @@ theme: gaia
 class:
   - invert
 
+style: |
+  .en { padding-top: 10px; font-size: 0.8em; }
 ---
 
 <!-- _class: lead invert -->
@@ -29,12 +31,13 @@ Rubyで作ったお話と、
 
 ---
 
-## 🐦 自己紹介
+## 🐦 About me
 
 - はたけやまたかし
-- 株式会社永和システムマネジメント
+  Takashi Hatakeyama
+- ESM, Inc.
   ![w:300](esm.png)
-- Twitter(現X)： @htkymtks
+- Twitter(X)： @htkymtks
   ![w:600](twitter.png)
 
 <!--
@@ -51,12 +54,15 @@ Rubyで作ったお話と、
 
 ---
 
-# 🏁 趣味
+# 🏁 Hobbies
 
-- 低レイヤプログラミング
+- 低レイヤプログラミング<br><div class="en">Low-level Programming</div>
   - 自作CPU
+    <div class="en">Building a CPU</div>
   - 自作RISC-Vシミュレータ
+    <div class="en">Building a RISC-V Simulator</div>
   - MinCamlコンパイラの移植
+    <div class="en">Porting MinCaml Compiler</div>
 
 ![bg right:40% vertical](fpga.png) ![bg right w:550](tron.png)
 
@@ -73,6 +79,7 @@ MinCamlコンパイラを移植したりしています。
 # 🐪 MinCaml → 💎TinyRuby
 
 - 趣味のMinCamlコンパイラの移植を行なっているうちに、1からコンパイラを作りたくなる
+  <div class="en">After porting MinCaml, I started wanting to build a compiler from scratch.</div>
 - そこで TinyRuby ですよ!!!
 
 <!--
@@ -81,11 +88,11 @@ MinCamlコンパイラを移植したりしています。
 
 ---
 
-### 🙂 今日話すこと
+# 🙂 Today's Topics
 
-- TinyRubyの紹介
-- コンパイラ作成Tips
-- コンパイラはじめの一歩
+- Introduction to TinyRuby
+- Tips for Building a Compiler
+- First Steps in Building a Compiler
 
 <!--
 今日お話しすることは、
@@ -101,7 +108,7 @@ TinyRubyの作成を通じて得た「コンパイラ作成の便利情報、Tip
 
 <style scoped> section { font-size: 2.0em; } </style>
 
-# 🐇 TinyRuby の紹介
+# 🐇 Introduction to TinyRuby
 
 こんな感じのRubyみたいなプログラミング言語
 
@@ -128,7 +135,7 @@ p fib(10)
 
 ---
 
-## 🐇🐇 TinyRuby のビルドと実行
+## 🐇🐇 Build and run TinyRuby
 
 こんな感じにビルドする
 
@@ -156,18 +163,14 @@ $ ./a.out
 
 ---
 
-<style scoped> section { font-size: 1.9em; } </style>
+<!-- <style scoped> section { font-size: 1.9em; } </style> -->
 
-# 🤖 TinyRuby のパーサー
+# 🤖 TinyRuby's parser
 
-- TinyRubyのパーサーはMinRubyのパーサーをそのまま利用
+- TinyRuby uses parser of MinRuby
 - MinRuby
   - 書籍「RubyでつくるRuby」に登場するRubyのサブセット
-- MinRuby との差異
-  - データ型は整数型のみ
-  - ArrayとHashをサポートしない
-  - 関数の引数は6つまで
-- TinyRubyはMinRubyのサブセット
+    <div class="en">A subset of Ruby that appears in the book "Learning Ruby by Making Ruby"</div>
 
 ![bg w:350 right:30% auto](ruby-de-ruby.png)
 
@@ -177,7 +180,18 @@ $ ./a.out
 TinyRubyのパーサーはMinRubyのパーサーをそのまま利用しています。
 
 MinRubyというのは、「RubyでつくるRuby」という書籍に登場する、Rubyのサブセット言語です。こちらの書影が「RubyでつくるRuby」になります。
+-->
 
+---
+## 🦏 TinyRubyとMinRubyの差異
+
+- Difference from MinRuby
+  - Only support integer type
+  - No support for Array and Hash
+  - Up to 6 arguments for functions
+- TinyRuby is a subset of MinRuby
+
+<!--
 TinyRubyはMinRubyのパーサーを使ってはいますが、コンパイラの実装を簡単にするため、MinRubyからいくつかの機能が落とされています。
 
 例えば、
@@ -190,14 +204,15 @@ TinyRubyはMinRubyのパーサーを使ってはいますが、コンパイラ�
 
 ---
 
-## 🐧 TinyRubyコンパイラのターゲット環境
+## 🐧 Target environment of TinyRuby compiler
 
 - CPU
   - x86-64
 - OS
   - Linux
-- 開発環境
+- Development environment
   - MacやWindowsの人はDocker上のLinux環境などで開発してね
+
 <!--
 TinyRubyコンパイラのターゲット環境は、CPUが x86-64 で、OSが Linux となります。
 
@@ -207,11 +222,14 @@ macOS や Windows をお使いの方は、Docker 上の Linux 環境などで開
 
 ---
 
-# 🦊 コンパイラ作成のTips
+# 🦊 Tips for Building a Compiler
 
 1) Cコンパイラが出力するアセンブリコードを活用
+   <div class="en">Utilize the assembly code output by the C compiler</div>
 2) レジスタとABIを知る
+    <div class="en">Understand registers and the ABI</div>
 3) 小さなステップで進める
+    <div class="en">Progress in small steps</div>
 
 
 <!--
@@ -224,13 +242,15 @@ macOS や Windows をお使いの方は、Docker 上の Linux 環境などで開
 
 ---
 
-# :one: Cコンパイラが出力するアセンブリコードを活用
+### :one: Cコンパイラが出力するアセンブリコードを活用 / Utilize the assembly code output by the C compiler
 
 アセンブリの書き方に悩んだら、Cコンパイラが出力するアセンブリを確認する
+<div class="en">
+If you're struggling with how to write assembly code, check the assembly output by the C compiler</div>
 
 - 2つの確認方法
   - (1) Compiler Explorer
-  - (2) GCCの`-S`オプション
+  - (2) GCCの`-S` Option
 
 <!--
 では、1つ目のTips「Cコンパイラが出力するアセンブリコードを活用する」についてお話しします。
@@ -319,21 +339,18 @@ return_100:
 
 ---
 
-## ⚡️🐃 Compiler Explorer と GCC の使い分け
+### ⚡️🐃 Compiler Explorer と GCC の使い分け / Differentiating the Use of Compiler Explorer and GCC
 
-Compiler Explorer が出力したアセンブリは、出力オプションやプラットフォームの違いで、そのままでは動かないことがある
-
-- 出力したアセンブリをそのままビルドにかけたい場合
+- When you need to compile the assembly as-is
   - → GCC
-- それ以外
+  - Because Compiler Explorer cannot be built as it is when the directives are hidden
+- Otherwise
   - → Compiler Explorer
 
 <!--
 「Compiler Explorer」と「GCC」の使い分けについてです。
 
 基本的には「Compiler Explorer」を使っておけばOKですが、
-
-Compiler Explorer が出力するアセンブリは、出力オプションに
 
 Compiler Explorer が出力したアセンブリは、出力オプションの設定によっては、そのままビルドできないことがままあります。
 
@@ -344,9 +361,11 @@ Compiler Explorer が出力したアセンブリは、出力オプションの�
 
 ---
 
-# :two: レジスタとABIを知る
+# :two: レジスタとABIを知る / Understand registers and the ABI
 
 コンパイラが出力するアセンブリを理解するためには、対象となるCPUの「レジスタ構成」と「ABI」を知る必要がある
+
+To understand the assembly output by the compiler, you need to know the "registers" and "ABI" of the target CPU.
 
 <!--
 二つめのTipsは「レジスタとABIを知る」です。
@@ -358,7 +377,7 @@ Compiler Explorer が出力したアセンブリは、出力オプションの�
 
 <style scoped> section { font-size: 1.5em; }</style>
 
-### 📝 汎用レジスタ一覧
+### 📝 汎用レジスタ一覧 / General-purpose registers
 
 x86-64 の 16 本の 64 ビット汎用レジスタ
 
@@ -392,6 +411,8 @@ x86-64 は、ここに示す 16 本の 64 ビット汎用レジスタがあり�
 
 アセンブリ言語レベルでの関数の呼び出し規約などのこと
 
+ABI (Application Binary Interface) is a set of conventions for functions at the assembly language level.
+
 <!--
 次に、ABI についてお話しします。
 
@@ -400,12 +421,12 @@ ABI とは、Application Binary Interface の略で、アセンブリ言語レ�
 
 ---
 
-## 🤧 (x86-64 での) 関数の引数の渡し方
+### 🤧 関数の引数の渡し方 / Passing function arguments
 
 - 最初の6つの引数は、RDI, RSI, RDX, RCX, R8, R9 レジスタに渡す
 - 7つ目以降の引数は、スタックに積む
 
-## 🐸 (x86-64 での) 関数の戻り値の返し方
+### 🐸 関数の戻り値の返し方 / Returning function values
 
 - 戻り値は、RAX レジスタに返す
 
@@ -426,7 +447,7 @@ ABI でこうした規約を定義することで、規約に従ったモジュ�
 
 ---
 
-## 🦀 ABI の詳細資料
+## 🦀 ABI の詳細資料 / Detailed ABI documentation
 
 x86-64 の ABI の詳細については、以下のドキュメントなどを参照
 
@@ -443,19 +464,19 @@ x86-64 の ABI のより詳細な情報については、こちらの資料な�
 
 <style scoped> section { font-size: 1.9em; } </style>
 
-# :three: 小さなステップで進める
+## :three: 小さなステップで進める / Progress in small steps
 
 小さなステップで機能を追加していく
 
-- 整数リテラル
-- 四則演算
-- プリント関数呼び出し
-- 複数ステートメント
-- 変数の代入と参照
-- 比較演算
-- 条件分岐
-- 関数呼び出し
-- 関数定義
+- 整数リテラル / Integer literals
+- 四則演算 / Arithmetic operations
+- プリント関数呼び出し / Print function call
+- 複数ステートメント / Multiple statements
+- 変数の代入と参照 / Variable assignment and reference
+- 比較演算 / Comparison operations
+- 条件分岐 / Conditional branching
+- 関数呼び出し / Function call
+- 関数定義 / Function definition
 
 <!--
 3つ目のTipsは「小さなステップで進める」です。
@@ -506,10 +527,14 @@ assert 30 'a = 10; b = 20; p a + b'
 
 ---
 
-## 🐾 小さなステップで進めることのメリット
+### 🐾 小さなステップで進めることの利点 / Advantages of "Progress in small steps"
 
 - コンパイラに必要な知識を段階的に習得できる
+  <div class="en">
+  You can learn the essential knowledge for compilers gradually.</div>
 - 適度な粒度でテストを書きやすい → テスト駆動開発が行いやすい
+  <div class="en">
+  You can write tests at an appropriate granularity, making test-driven development easier.</div>
 
 <!--
 また、小さなステップで進めることのメリットは、
@@ -522,12 +547,22 @@ assert 30 'a = 10; b = 20; p a + b'
 
 ---
 
-## 🚗 テスト駆動開発(TDD)のメリット
+### 🚗 テスト駆動開発(TDD)の利点 / Advantages of "TDD"
 
 - 目の前の問題にだけ集中できる
+  <div class="en">
+  You can focus entirely on the issue at hand.</div>
 - テスト実施が容易
+  <div class="en">
+  Testing is easy.</div>
 - フィードバックを即時に得られる
-- 短いサイクルで達成感を得られるため、モチベーションを維持しやすい
+  <div class="en">
+  You can get feedback immediately.</div>
+- 短いサイクルで達成感を得られるため、モチベーションを保ちやすい
+  <div class="en">
+  Frequent accomplishments in short cycles help sustain motivation.</div>
+
+
 
 <!--
 テスト駆動開発で進めることのメリットは、
@@ -542,7 +577,7 @@ assert 30 'a = 10; b = 20; p a + b'
 
 ---
 
-### 📖 参考資料
+### 📖 参考資料 / References
 
 - 低レイヤを知りたい人のためのCコンパイラ作成入門
   - https://www.sigbus.info/compilerbook
@@ -557,7 +592,7 @@ assert 30 'a = 10; b = 20; p a + b'
 
 <!-- _class: lead invert -->
 
-# :rocket: コンパイラはじめの一歩
+# :rocket: First Steps in Building a Compiler
 
 これまで紹介したTipsを使って、整数を評価してリターンコードとして返すだけのコンパイラを作成します
 
@@ -567,7 +602,7 @@ assert 30 'a = 10; b = 20; p a + b'
 
 <!-- _class: lead invert -->
 
-## 🐉 続きはこちら
+## 🐉 Next Steps
 
 https://scrapbox.io/htkymtks/TinyRubyコンパイラ
 
@@ -581,15 +616,18 @@ https://scrapbox.io/htkymtks/TinyRubyコンパイラ
 
 ---
 
-# 🍜 まとめ
+### 🍜 Summary
 
-- TinyRuby の紹介
-- コンパイラ作成のTipsの紹介
-  - Cコンパイラが出力するアセンブリコードの活用
-  - レジスタとABIを知る
-  - 小さなステップで進める
+- Introduction to TinyRuby
+- Tips for Building a Compiler
+  - Utilize the assembly code output by the C compiler
+  - Understand registers and the ABI
+  - Progress in small steps
 - コンパイラ作ってみたくなった？
-  - コンパイラを通して低レイヤの世界にふれてみよう！
+  <div class="en">Feeling like trying to build a compiler?</div>
+- コンパイラを通して低レイヤの世界にふれてみよう！
+  <div class="en">Dive into the world of low-level programming through compilers!</div>
+
 
 <!--
 では、本日のまとめです。
@@ -605,4 +643,4 @@ TinyRubyの紹介と、
 
 <!-- _class: lead invert -->
 
-# 💎 Let's Enjoy Writing Compilers!
+# 💎 終
