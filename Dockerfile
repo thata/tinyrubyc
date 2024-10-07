@@ -1,7 +1,7 @@
 # usage:
 #   cd ~/src/tinyrubyc
 #   docker build --platform=linux/amd64 -t tinyruby-dev .
-#   docker run --rm -it tinyruby-dev bash
+#   docker run --rm -it -v $PWD:/app --platform=linux/amd64 tinyruby-dev bash
 
 # ベースイメージとしてRubyの公式イメージを指定
 FROM ruby:3.3
